@@ -1,0 +1,8 @@
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\bin\Debug\LightBuzz.Vitruvius.FingerTracking.XML
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\bin\Debug\LightBuzz.Vitruvius.FingerTracking.dll
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\bin\Debug\LightBuzz.Vitruvius.FingerTracking.pdb
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\bin\Debug\Microsoft.Kinect.dll
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\bin\Debug\Microsoft.Kinect.xml
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\obj\Debug\LightBuzz.Vitruvius.FingerTracking.csprojResolveAssemblyReference.cache
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\obj\Debug\LightBuzz.Vitruvius.FingerTracking.dll
+C:\Users\Lu\Documents\Visual Studio 2015\Projects\Kinect-Finger-Tracking-master\KinectFingerTracking\LightBuzz.Vitruvius.FingerTracking\obj\Debug\LightBuzz.Vitruvius.FingerTracking.pdb
