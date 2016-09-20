@@ -1,17 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class ComputeDistances : MonoBehaviour {
 
     public GameObject HandRight;
     public GameObject HandLeft;
+	public GameObject[] buttons; 
+	public Dictionary<string, int> buttons = new Dictionary<string,int>();
     public double DistanceLeft;
     public double DistanceRight;
     public double Threshold = 10d;
 
 	// Use this for initialization
 	void Start () {
+		buttons.Add ("Bigbuttondown", 1);
+		buttons.Add ("Bigbuttonleft", 2);
+		buttons.Add ("Bigbuttonright", 3);
+		buttons.Add ("Bigbuttonup", 4);
+		buttons.Add ("TOUCH1_1", 5);
+		buttons.Add ("TOUCH2_2", 6);
+		buttons.Add ("TOUCH3_3", 7);
+		buttons.Add ("TOUCH4_4", 8);
+		buttons.Add ("TOUCH5_5", 9);
+		buttons.Add ("ExitButton", 10);
 	
 	}
 
@@ -20,7 +33,10 @@ public class ComputeDistances : MonoBehaviour {
         HandRight = GameObject.Find("model_hand_right");
         HandLeft = GameObject.Find("model_hand_left");
 
-        // Update left hand
+
+        
+
+		// Update left hand
         DistanceLeft = euclideanDistance(HandLeft.transform.position, gameObject.transform.position);
         // Update right hand
         DistanceRight = euclideanDistance(HandRight.transform.position, gameObject.transform.position);
@@ -32,6 +48,7 @@ public class ComputeDistances : MonoBehaviour {
         
 
         // Chekc traffic light
+
 
         if (DistanceLeft <= Threshold && DistanceRight <= Threshold)
         {
