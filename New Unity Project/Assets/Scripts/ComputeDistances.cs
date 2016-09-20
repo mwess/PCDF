@@ -17,8 +17,8 @@ public class ComputeDistances : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        HandRight = GameObject.Find("hand_right");
-        HandLeft = GameObject.Find("hand_left");
+        HandRight = GameObject.Find("model_hand_right");
+        HandLeft = GameObject.Find("model_hand_left");
 
         // Update left hand
         DistanceLeft = euclideanDistance(HandLeft.transform.position, gameObject.transform.position);
@@ -28,7 +28,7 @@ public class ComputeDistances : MonoBehaviour {
         //print("check the new positions");
         //print("Position of Left Hand: " + HandLeft.transform.position);
         //print("Position of Right Hand: " + HandRight.transform.position);
-        print("Distance left:" + DistanceLeft);
+        //print("Distance left:" + DistanceLeft);
         
 
         // Chekc traffic light

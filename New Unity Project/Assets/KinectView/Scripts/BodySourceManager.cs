@@ -17,29 +17,29 @@ public class BodySourceManager : MonoBehaviour
     void Start () 
     {
         _Sensor = KinectSensor.GetDefault();
-        print("Default sensor is: " + _Sensor);
+        //print("Default sensor is: " + _Sensor);
 
         if (_Sensor != null)
         {
             _Reader = _Sensor.BodyFrameSource.OpenReader();
 
-            print("Reader: " + _Reader);
-            print("Sensor is open: " + _Sensor.IsOpen);
+            //print("Reader: " + _Reader);
+            //print("Sensor is open: " + _Sensor.IsOpen);
             if (!_Sensor.IsOpen)
             {
                 _Sensor.Open();
             }
-            print("Sensor is now open: " + _Sensor.IsOpen);
+            //print("Sensor is now open: " + _Sensor.IsOpen);
         }   
     }
     
     void Update () 
     {
-        print(_Reader);
+        //print(_Reader);
         if (_Reader != null)
         {
             var frame = _Reader.AcquireLatestFrame();
-            print(frame);
+            //print(frame);
             if (frame != null)
             {
                 if (_Data == null)

@@ -79,15 +79,6 @@
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kinect">
-      <HintPath>Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\Microsoft.Kinect.dll</HintPath>
-    </Reference>
-    <Reference Include="LightBuzz.Vitruvius.FingerTracking">
-      <HintPath>Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\obj\Debug\LightBuzz.Vitruvius.FingerTracking.dll</HintPath>
-    </Reference>
-    <Reference Include="LightBuzz.Vitruvius.FingerTracking">
-      <HintPath>Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\LightBuzz.Vitruvius.FingerTracking.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="New Unity Project.CSharp.Plugins.csproj">
@@ -108,22 +99,6 @@
     <Compile Include="Assets\KinectView\Scripts\MultiSourceManager.cs" />
     <Compile Include="Assets\Scripts\ComputeDistances.cs" />
     <Compile Include="Assets\Scripts\DetectJoins.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\DepthPointEx.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\Finger.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\GrahamScan.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\Hand.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\HandCollection.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\HandsController.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\PointFilter.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\Properties\AssemblyInfo.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
-    <Compile Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\LightBuzz.Vitruvius.FingerTracking.XML" />
-    <None Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\Microsoft.Kinect.xml" />
-    <None Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\obj\Debug\LightBuzz.Vitruvius.FingerTracking.csproj.FileListAbsolute.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

@@ -1,0 +1,137 @@
+fileFormatVersion: 2
+guid: 6f520d09b7c79fd4d9b7576d72094fe1
+timeCreated: 1473803264
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Cabinetback
+    100002: Cabinetdoorpart
+    100004: Cabinetdoorpart_MeshPart0
+    100006: Cabinetdoorpart_MeshPart1
+    100008: Cabinetdoorpart_MeshPart2
+    100010: Cabinetdown
+    100012: Cabinetfront
+    100014: Cabinetkeyhole
+    100016: Cabinetleft
+    100018: Cabinetleftfront
+    100020: Cabinetright
+    100022: Cabinetrightfront
+    100024: Cabinetup
+    100026: //RootNode
+    400000: Cabinetback
+    400002: Cabinetdoorpart
+    400004: Cabinetdoorpart_MeshPart0
+    400006: Cabinetdoorpart_MeshPart1
+    400008: Cabinetdoorpart_MeshPart2
+    400010: Cabinetdown
+    400012: Cabinetfront
+    400014: Cabinetkeyhole
+    400016: Cabinetleft
+    400018: Cabinetleftfront
+    400020: Cabinetright
+    400022: Cabinetrightfront
+    400024: Cabinetup
+    400026: //RootNode
+    2300000: Cabinetback
+    2300002: Cabinetdoorpart_MeshPart0
+    2300004: Cabinetdoorpart_MeshPart1
+    2300006: Cabinetdoorpart_MeshPart2
+    2300008: Cabinetdown
+    2300010: Cabinetfront
+    2300012: Cabinetkeyhole
+    2300014: Cabinetleft
+    2300016: Cabinetleftfront
+    2300018: Cabinetright
+    2300020: Cabinetrightfront
+    2300022: Cabinetup
+    3300000: Cabinetback
+    3300002: Cabinetdoorpart_MeshPart0
+    3300004: Cabinetdoorpart_MeshPart1
+    3300006: Cabinetdoorpart_MeshPart2
+    3300008: Cabinetdown
+    3300010: Cabinetfront
+    3300012: Cabinetkeyhole
+    3300014: Cabinetleft
+    3300016: Cabinetleftfront
+    3300018: Cabinetright
+    3300020: Cabinetrightfront
+    3300022: Cabinetup
+    4300000: Cabinetkeyhole
+    4300002: Cabinetdoorpart_MeshPart0
+    4300004: Cabinetdoorpart_MeshPart1
+    4300006: Cabinetdoorpart_MeshPart2
+    4300008: Cabinetback
+    4300010: Cabinetdown
+    4300012: Cabinetup
+    4300014: Cabinetright
+    4300016: Cabinetleft
+    4300018: Cabinetleftfront
+    4300020: Cabinetrightfront
+    4300022: Cabinetfront
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

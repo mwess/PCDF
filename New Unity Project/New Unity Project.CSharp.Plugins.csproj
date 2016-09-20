@@ -79,15 +79,6 @@
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kinect">
-      <HintPath>Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\Microsoft.Kinect.dll</HintPath>
-    </Reference>
-    <Reference Include="LightBuzz.Vitruvius.FingerTracking">
-      <HintPath>Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\obj\Debug\LightBuzz.Vitruvius.FingerTracking.dll</HintPath>
-    </Reference>
-    <Reference Include="LightBuzz.Vitruvius.FingerTracking">
-      <HintPath>Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\LightBuzz.Vitruvius.FingerTracking.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Standard Assets\CameraIntrinsics.cs" />
@@ -175,11 +166,6 @@
     <Compile Include="Assets\Standard Assets\Windows\Kinect\TrackingConfidence.cs" />
     <Compile Include="Assets\Standard Assets\Windows\Kinect\TrackingState.cs" />
     <Compile Include="Assets\Standard Assets\Windows\Kinect\Vector4.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\LightBuzz.Vitruvius.FingerTracking.XML" />
-    <None Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\bin\Debug\Microsoft.Kinect.xml" />
-    <None Include="Assets\Scripts\LightBuzz.Vitruvius.FingerTracking\obj\Debug\LightBuzz.Vitruvius.FingerTracking.csproj.FileListAbsolute.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
