@@ -97,6 +97,7 @@
     <Compile Include="Assets\KinectView\Scripts\InfraredSourceManager.cs" />
     <Compile Include="Assets\KinectView\Scripts\InfraredSourceView.cs" />
     <Compile Include="Assets\KinectView\Scripts\MultiSourceManager.cs" />
+    <Compile Include="Assets\Scripts\ButtonPush.cs" />
     <Compile Include="Assets\Scripts\ComputeDistances.cs" />
     <Compile Include="Assets\Scripts\DetectJoins.cs" />
   </ItemGroup>

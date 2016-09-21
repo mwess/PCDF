@@ -22,6 +22,12 @@ public class DetectJoins : MonoBehaviour {
     //public float tmpmult = 375f;
     public double counter = 0;
     public double sum = 0;
+    public int numberOfFrames = 7;
+    public float[,,] handPositionsTimeSteps;
+    public int currentFrame = 0;
+    public int nDims = 3;
+    public float[,] medMatrix;
+    public List<float> medList;
 
 
    
@@ -41,6 +47,8 @@ public class DetectJoins : MonoBehaviour {
 
         buttons = new GameObject[numberOfButtons];
         handPositions = new Vector3[numberOfHandPositions];
+        handPositionsTimeSteps = new float[numberOfFrames,numberOfHandPositions,nDims];
+        medMatrix = new float[numberOfHandPositions, nDims];
 
         if (BodySrcManager == null)
         {
@@ -50,9 +58,9 @@ public class DetectJoins : MonoBehaviour {
         {
             BodyManager = BodySrcManager.GetComponent<BodySourceManager>();
         }
-        GameObject HandLeft = GameObject.Find("model_hand_left");
-        mesh = HandLeft.GetComponent<MeshFilter>().mesh;
-
+        //Wissen nicht warum das hier steht, ins Update verschoben
+        //GameObject HandLeft = GameObject.Find("model_hand_left");
+        //mesh = HandLeft.GetComponent<MeshFilter>().mesh;
 
     }
 
@@ -77,7 +85,8 @@ public class DetectJoins : MonoBehaviour {
             }
             if (body.IsTracked)
             {
-
+                GameObject currentHand = GameObject.Find("model_hand_left");
+                mesh = currentHand.GetComponent<MeshFilter>().mesh;
                 var pos = body.Joints[TrackedJoint].Position;
 
                 //var rot = gameObject.transform.eulerAngles;
@@ -106,16 +115,53 @@ public class DetectJoins : MonoBehaviour {
                 //print("Rotation is: (x: " + rot.x + ", y:" + rot.y + ", z: " + rot.z + ")");
                 if (TrackedJoint.ToString() == "HandLeft")
                 {
+
                     var tmppos = body.Joints[JointType.HandLeft].Position;
-                    
-                    handPositions[0] = new Vector3(scalingFactor* tmppos.X, scalingFactor* tmppos.Y, scalingFactor* tmppos.Z);
+                    /*handPositions[0] = new Vector3(scalingFactor* tmppos.X, scalingFactor* tmppos.Y, scalingFactor* tmppos.Z);
                     tmppos = body.Joints[JointType.WristLeft].Position;
                     handPositions[1] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
                     tmppos = body.Joints[JointType.HandTipLeft].Position;
                     handPositions[2] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
                     tmppos = body.Joints[JointType.ThumbLeft].Position;
                     handPositions[3] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
+                    */
+                    handPositionsTimeSteps[currentFrame, 0, 0] = scalingFactor * tmppos.X;
+                    handPositionsTimeSteps[currentFrame, 0, 1] = scalingFactor * tmppos.Y;
+                    handPositionsTimeSteps[currentFrame, 0, 2] = scalingFactor * tmppos.Z;
+                    tmppos = body.Joints[JointType.WristLeft].Position;
+                    handPositionsTimeSteps[currentFrame, 1, 0] = scalingFactor * tmppos.X;
+                    handPositionsTimeSteps[currentFrame, 1, 1] = scalingFactor * tmppos.Y;
+                    handPositionsTimeSteps[currentFrame, 1, 2] = scalingFactor * tmppos.Z;
+                    tmppos = body.Joints[JointType.HandTipLeft].Position;
+                    handPositionsTimeSteps[currentFrame, 2, 0] = scalingFactor * tmppos.X;
+                    handPositionsTimeSteps[currentFrame, 2, 1] =  scalingFactor * tmppos.Y;
+                    handPositionsTimeSteps[currentFrame, 2, 2] = scalingFactor * tmppos.Z;
+                    tmppos = body.Joints[JointType.ThumbLeft].Position;
+                    handPositionsTimeSteps[currentFrame, 3, 0] = scalingFactor * tmppos.X;
+                    handPositionsTimeSteps[currentFrame, 3, 1] = scalingFactor * tmppos.Y;
+                    handPositionsTimeSteps[currentFrame, 3, 2] = scalingFactor * tmppos.Z;
+                    currentFrame++;
 
+
+ 
+
+                    if ((currentFrame + 1) % numberOfFrames != 0)
+                    {
+                        return;
+                    }
+                    for (int i = 0; i < numberOfHandPositions; i++)
+                    {
+                        for(int j = 0; j < nDims; j++)
+                        {
+                            medMatrix[i, j] = Median(handPositionsTimeSteps, i, j);
+                        }
+                    }
+                    currentFrame = 0;
+                    Vector3 handtip = new Vector3((medMatrix[2, 0] - medMatrix[0, 0]), (medMatrix[2, 1] - medMatrix[0, 1]), (medMatrix[2, 2] - medMatrix[0, 2]));
+                    Vector3 handthumb = new Vector3((medMatrix[3, 0] - medMatrix[0, 0]), (medMatrix[3, 1] - medMatrix[0, 1]), -(medMatrix[3, 2] - medMatrix[0, 2]));
+                    Vector3 cross = Vector3.Cross(handthumb, handtip) * 20;
+                    handthumb = Vector3.Cross(handtip, cross) * 20;
+                    
                     //print(gameObject.transform.position.x);
                     //print(handPositions[0].x);
                     /*sum += Math.Abs(gameObject.transform.position.x / handPositions[0].x);
@@ -127,7 +173,7 @@ public class DetectJoins : MonoBehaviour {
                     //print(handPositions[1]);
                     //print(handPositions[2]);
                     //print(handPositions[3]);
-
+                    /*
                     var pos_jointHandLeft = body.Joints[JointType.HandLeft].Position;
 
                     var pos_jointWristLeft = body.Joints[JointType.WristLeft].Position;
@@ -135,16 +181,21 @@ public class DetectJoins : MonoBehaviour {
                     var pos_jointTipLeft = body.Joints[JointType.HandTipLeft].Position;
 
                     var pos_jointThumbLeft = body.Joints[JointType.ThumbLeft].Position;
-
+                    
                     //gameObject.transform.rotation.Set
                     //Create a Quaternion for the rotation of the hand. Therefore take the vector from the tip to the hand as the forward 
                     //vector for the orientation and from thumb to tip
                     Vector3 handtip = new Vector3((pos_jointTipLeft.X - pos_jointHandLeft.X), (pos_jointTipLeft.Y - pos_jointHandLeft.Y), (pos_jointTipLeft.Z - pos_jointHandLeft.Z));
                     Vector3 handthumb = new Vector3((pos_jointThumbLeft.X - pos_jointHandLeft.X), (pos_jointThumbLeft.Y - pos_jointHandLeft.Y), -(pos_jointThumbLeft.Z - pos_jointHandLeft.Z));
+                    Vector3 cross = Vector3.Cross(handthumb, handtip)*20;
+                    handthumb = Vector3.Cross(handtip, cross) * 20;
+                    
 
 
-
-
+                    //Debug.DrawLine(handPositions[0] - (handtip * 15), handPositions[0] + (handtip* 15 ), Color.blue);
+                    //Debug.DrawLine(handPositions[0] - (handthumb * 15), handPositions[0] + (handthumb * 15), Color.red);
+                    //Debug.DrawLine(handPositions[0] - (cross * 15), handPositions[0] + (cross * 15), Color.green);
+                    */
                     Vector3 forward = handthumb;
                     Vector3 up = Vector3.Cross(handthumb, handtip);
                     //forward = -up;
@@ -152,12 +203,14 @@ public class DetectJoins : MonoBehaviour {
                     Quaternion LeftHandRotation = Quaternion.LookRotation(forward, up);
                     LeftHandRotation.x = LeftHandRotation.x;
                     LeftHandRotation.y = LeftHandRotation.y;
-                    LeftHandRotation.z = LeftHandRotation.z;
-                    LeftHandRotation.w = LeftHandRotation.w;
+                    LeftHandRotation.z = -LeftHandRotation.z;
+                    LeftHandRotation.w = -LeftHandRotation.w;
 
                     gameObject.transform.rotation = LeftHandRotation;
-                    gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, pos.Z * scalingFactor);
+                    gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
 
+                    Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
+                    gameObject.GetComponent<Renderer> ().material.color = temp;
 
                 }
                 else if (TrackedJoint.ToString() == "HandRight")
@@ -175,7 +228,11 @@ public class DetectJoins : MonoBehaviour {
                     var pos_jointWristRight = body.Joints[JointType.WristRight].Position;
                     var pos_jointTipRight = body.Joints[JointType.HandTipRight].Position;
                     var pos_jointThumbRight = body.Joints[JointType.ThumbRight].Position;
-
+                    //print("Position Right: ");
+                    //foreach (var b in handPositions)
+                    //{
+                    //    print(b);
+                    //}
                     /*
                     print("HandRight: " + gameObject.transform.position);
                     print(handPositions[0]);
@@ -184,22 +241,34 @@ public class DetectJoins : MonoBehaviour {
                     print(handPositions[3]);*/
                     Vector3 handtip = new Vector3(pos_jointTipRight.X - pos_jointHandRight.X, pos_jointTipRight.Y - pos_jointHandRight.Y, pos_jointTipRight.Z - pos_jointHandRight.Z);
                     Vector3 handthumb = new Vector3(pos_jointThumbRight.X - pos_jointHandRight.X, pos_jointThumbRight.Y - pos_jointHandRight.Y, pos_jointThumbRight.Z - pos_jointHandRight.Z);
+                    Vector3 cross = Vector3.Cross(handthumb, handtip) * 20;
+                    handthumb = Vector3.Cross(handtip, cross) * 20;
+
+                    //Debug.DrawLine(handPositions[0] - (handtip * 15), handPositions[0] + (handtip * 15), Color.blue);
+                    //Debug.DrawLine(handPositions[0] - (handthumb * 15), handPositions[0] + (handthumb * 15), Color.red);
+                    //Debug.DrawLine(handPositions[0] - (cross * 15), handPositions[0] + (cross * 15), Color.green);
 
                     Vector3 forward = handthumb;
                     Vector3 up = Vector3.Cross(handtip, handthumb);
 
                     Quaternion RightHandRotation = Quaternion.LookRotation(forward, up);
+                    RightHandRotation.x = RightHandRotation.x;
+                    RightHandRotation.y = RightHandRotation.y;
+                    RightHandRotation.z = -RightHandRotation.z;
+                    RightHandRotation.w = -RightHandRotation.w;
 
                     foreach (KeyValuePair<string, int> pair in buttonDict)
                     {
                         buttons[pair.Value] = GameObject.Find(pair.Key);
                         //print(pair.Value + "   " + buttons[pair.Value]);
                     }
-                    computeDistanceAndColorButtons(handPositions, buttons);
-                    gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, pos.Z * scalingFactor);
-                    gameObject.transform.rotation = RightHandRotation;
+                    //computeDistanceAndColorButtons(handPositions, buttons);
+                 
+                    //gameObject.transform.rotation = RightHandRotation;
+                    //gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
 
-
+                    Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
+                    gameObject.GetComponent<Renderer>().material.color = temp;
                 }
 
                 //gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, pos.Z * scalingFactor);
@@ -244,7 +313,7 @@ public class DetectJoins : MonoBehaviour {
         //print("minDist: " + minDist);
         if (minDist <= collisionThreshold)
         {
-            print("GREEN: " + minDist + " " + minIndex);
+            //print("GREEN: " + minDist + " " + minIndex);
             buttons[minIndex].GetComponent<Renderer>().material.color = Color.green;
         }
     }
@@ -260,7 +329,91 @@ public class DetectJoins : MonoBehaviour {
   
 
 
-    public static Quaternion QuaternionFromMatrix(Matrix4x4 m) { return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1)); }
+    public static Quaternion QuaternionFromMatrix(Matrix4x4 m)
+    {
+        return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
+    }
 
 
+    void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0.1f)
+    {
+        GameObject myLine = new GameObject();
+        myLine.transform.position = start;
+        myLine.AddComponent<LineRenderer>();
+        LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+        lr.SetColors(color, color);
+        lr.SetWidth(150f, 200f);
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
+        GameObject.Destroy(myLine, duration);
+    }
+    private int Partition(int start, int end, System.Random rnd = null)
+    {
+        if (rnd != null)
+            Swap(end, rnd.Next(start, end));
+
+        var pivot = medList[end];
+        var lastLow = start - 1;
+        for (var i = start; i < end; i++)
+        {
+            if (medList[i].CompareTo(pivot) <= 0)
+                Swap(i, ++lastLow);
+        }
+        Swap(end, ++lastLow);
+        return lastLow;
+    }
+
+    /// <summary>
+    /// Returns Nth smallest element from the list. Here n starts from 0 so that n=0 returns minimum, n=1 returns 2nd smallest element etc.
+    /// Note: specified list would be mutated in the process.
+    /// Reference: Introduction to Algorithms 3rd Edition, Corman et al, pp 216
+    /// </summary>
+    public float NthOrderStatistic(int n, System.Random rnd = null)
+    {
+        return NthOrderStatistic(n, 0, medList.Count - 1, rnd);
+    }
+    private float NthOrderStatistic(int n, int start, int end, System.Random rnd)
+    {
+        while (true)
+        {
+            var pivotIndex = Partition(start, end, rnd);
+            if (pivotIndex == n)
+                return medList[pivotIndex];
+
+            if (n < pivotIndex)
+                end = pivotIndex - 1;
+            else
+                start = pivotIndex + 1;
+        }
+    }
+
+    public void Swap(int i, int j)
+    {
+        if (i == j)   //This check is not required but Partition function may make many calls so its for perf reason
+            return;
+        var temp = medList[i];
+        medList[i] = medList[j];
+        medList[j] = temp;
+    }
+
+    /// <summary>
+    /// Note: specified list would be mutated in the process.
+    /// </summary>
+    public float Median(float[,,] cube, int f, int s)
+    {
+        //var list = sequence.Select(getValue).ToList();
+        convertArrayToList(cube, f, s);
+        var mid = (medList.Count - 1) / 2;
+        return NthOrderStatistic(mid);
+    }
+
+    public void convertArrayToList(float[,,] cube, int f, int s)
+    {
+        medList = new List<float>();
+        for (int i = 0; i < numberOfFrames; i++)
+        {
+            medList.Add(cube[i, f, s]);
+        }
+    }
 }

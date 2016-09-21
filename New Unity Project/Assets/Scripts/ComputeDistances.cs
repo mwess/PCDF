@@ -32,7 +32,7 @@ public class ComputeDistances : MonoBehaviour {
         
 
         // Chekc traffic light
-
+        /*
         if (DistanceLeft <= Threshold && DistanceRight <= Threshold)
         {
             gameObject.GetComponent<Renderer>().material.color = Color.red;
@@ -46,6 +46,7 @@ public class ComputeDistances : MonoBehaviour {
         {
             gameObject.GetComponent<Renderer>().material.color = Color.white;
         }
+        */
         
 	}
 
