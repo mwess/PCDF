@@ -19,7 +19,7 @@ public class DetectJoins : MonoBehaviour {
     public Button[] buttons;
     public Vector3[] handPositions;
     public Vector3[] handMedPositions;
-    public double nearThreshold = 50.0;
+    public double nearThreshold = 30.0;
     public double collisionThreshold = 10.0;
     public int numberOfFrames = 7;
     public float[,,] handPositionsTimeSteps;
@@ -57,7 +57,7 @@ public class DetectJoins : MonoBehaviour {
         handPositionsTimeSteps = new float[numberOfFrames,numberOfHandPositions,nDims];
         handMedPositions = new Vector3[numberOfHandPositions];
         medMatrix = new float[numberOfHandPositions, nDims];
-        colors = new[] {Color.yellow, new Color(255,165,0,1), Color.red };
+        colors = new[] {Color.yellow, Color.yellow, new Color(255,165,0,1), new Color(255, 165, 0, 1), Color.red, Color.red };
         foreach (KeyValuePair<string, int> pair in buttonDict)
         {
             GameObject tmp = GameObject.Find(pair.Key);
@@ -172,7 +172,8 @@ public class DetectJoins : MonoBehaviour {
                     }
                     for (int i = 0; i < numberOfHandPositions; i++)
                     {
-                        Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], medMatrix[i, 2]);
+                        //Subtract z coordinate
+                        Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], -medMatrix[i, 2]);
                         handMedPositions[i] = tmp;
                     }
                     currentFrame = 0;
@@ -237,14 +238,22 @@ public class DetectJoins : MonoBehaviour {
                     gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
 
                     //print("Position: " + pos.X* scalingFactor + " " + pos.Y * scalingFactor + " " + (pos.Z*scalingFactor-350));
-                    computeDistanceAndColorButtons(handMedPositions);
+                    //Make hands transparent
+                    Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
+                    gameObject.GetComponent<Renderer>().material.color = temp;
+
+                    var tmpHandPos = GameObject.Find("model_hand_right").transform.position;
+                    var button1Pos = GameObject.Find("Cylinder_036").transform.position;
+                    if(euclideanDistance(tmpHandPos,button1Pos) > euclideanDistance(tmpHandPos,gameObject.transform.position))
+                    {
+                        computeDistanceAndColorButtons(handMedPositions);
+                    }
                     //for(int i =0; i < handMedPositions.Length; i++)
                     //{
                    ///     print("Position: " + handMedPositions[i].x + " " + handMedPositions[i].y + " " + (handMedPositions[i].z));
                    // }
 
-                    //Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
-                    //gameObject.GetComponent<Renderer>().material.color = temp;
+                    
 
                 }
                 else if (TrackedJoint.ToString() == "HandRight")
@@ -352,7 +361,8 @@ public class DetectJoins : MonoBehaviour {
                     }
                     for (int i = 0; i < numberOfHandPositions; i++)
                     {
-                        Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], medMatrix[i, 2]);
+                        //Subtract from z coordinate
+                        Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], -medMatrix[i, 2]);
                         handMedPositions[i] = tmp;
                     }
                     currentFrame = 0;
@@ -361,7 +371,7 @@ public class DetectJoins : MonoBehaviour {
                     Vector3 cross2 = Vector3.Cross(handthumb2, handtip2) * 20;
                     handthumb2 = Vector3.Cross(handtip2, cross2) * 20;
 
-                    computeDistanceAndColorButtons(handMedPositions);
+                    //computeDistanceAndColorButtons(handMedPositions);
 
                     Vector3 forward2 = handthumb2;
                     Vector3 up2 = Vector3.Cross(handthumb2, handtip2);
@@ -372,12 +382,19 @@ public class DetectJoins : MonoBehaviour {
                     RightHandRotation.y = RightHandRotation.y;
                     RightHandRotation.z = -RightHandRotation.z;
                     RightHandRotation.w = -RightHandRotation.w;
-
                     gameObject.transform.rotation = RightHandRotation;
                     gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
 
-                    //Color temp2 = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
-                    //gameObject.GetComponent<Renderer>().material.color = temp2;
+                    //Make hands transparent
+                    Color temp2 = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
+                    gameObject.GetComponent<Renderer>().material.color = temp2;
+
+                    var tmpHandPos = GameObject.Find("model_hand_left").transform.position;
+                    var button1Pos = GameObject.Find("Cylinder_036").transform.position;
+                    if (euclideanDistance(tmpHandPos, button1Pos) > euclideanDistance(tmpHandPos, gameObject.transform.position))
+                    {
+                        computeDistanceAndColorButtons(handMedPositions);
+                    }
                 }
 
             }
@@ -392,7 +409,10 @@ public class DetectJoins : MonoBehaviour {
             for (int j = 0; j < buttons.Length; j++)
             {
                 dist = euclideanDistance(hand[i], buttons[j].button.transform.position);
-                print("Dist: " + dist);
+                /*if(dist < 20)
+                {
+                    print("Dist: " + dist);
+                }*/
                 if (j == 0)
                 {
                     buttons[j].distance = dist;
@@ -403,19 +423,32 @@ public class DetectJoins : MonoBehaviour {
                 }
             }
         }
- 
+        for (int i = 0; i < hand.Length; i++)
+        {
+            print("Hand: " + i + " " + hand[i]);
+        }
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            print(i + " " + buttons[i].distance + " " + buttons[i].button.transform.position);
+        }
         Array.Sort<Button>(buttons, (x, y) => x.distance.CompareTo(y.distance)); 
         for(int i = 0; i < buttons.Length; i++)
         {
-            if (buttons[i].distance > nearThreshold)
+            if (i < colors.Length && buttons[i].distance < nearThreshold)
             {
-                buttons[i].button.GetComponent<Renderer>().material.color = buttons[i].originalColor;
-                //print("Reset color: " + buttons[i].button);
-            }
-            else if (i < 3)
-            {
-                buttons[i].button.GetComponent<Renderer>().material.color = colors[i];
+                if(buttons[i].button.GetComponent<Renderer>().material.color != Color.green)
+                {
+                    buttons[i].button.GetComponent<Renderer>().material.color = colors[i];
+                }
                 //print("Set Color to " + colors[i]);
+            }
+            else if (buttons[i].distance >= nearThreshold)
+            {
+                if (buttons[i].button.GetComponent<Renderer>().material.color != Color.green)
+                {
+                    buttons[i].button.GetComponent<Renderer>().material.color = buttons[i].originalColor;
+                }
+                //print("Reset color: " + buttons[i].button);
             }
         }
     }
@@ -426,7 +459,7 @@ public class DetectJoins : MonoBehaviour {
         //print("X: " + x.x + " Y: " + x.y + " Z: " + x.z);
         dist += Math.Pow(x.x - y.x, 2);
         dist += Math.Pow(x.y - y.y, 2);
-        dist += Math.Pow(x.z - y.z-offsetZ*2, 2);
+        dist += Math.Pow(x.z - y.z, 2);
         return Math.Sqrt(dist);
     }
   

@@ -27,7 +27,7 @@ public class ButtonPush : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
-        print("COLLISIION!!!!!!!!!!!!!!!!!!!");
+        //print("COLLISIION!!!!!!!!!!!!!!!!!!!");
         //gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.green, 40000f);
 
         gameObject.GetComponent<Renderer>().material.color = Color.green;
@@ -35,7 +35,7 @@ public class ButtonPush : MonoBehaviour {
     }
     void OnTriggerStay(Collider other)
     {
-        print("COLLISIION!!!!!!!!!!!!!!!!!!!");
+        //print("COLLISIION!!!!!!!!!!!!!!!!!!!");
             //gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.green, 40000f);
 
         gameObject.GetComponent<Renderer>().material.color = Color.green;
