@@ -35,6 +35,8 @@ public class DetectJoins2 : MonoBehaviour
     public Controller leap_controller = new Controller();
     public Vector oldLeap;
     public Vector3 oldKinect;
+    public bool trackingLeap;
+    public bool isRightHand;
 
     public struct Button
     {
@@ -57,20 +59,19 @@ public class DetectJoins2 : MonoBehaviour
         buttonDict.Add("TOUCH4_4", 7);
         buttonDict.Add("TOUCH5_5", 8);
         //buttonDict.Add("ExitButton", 9);
-
+        isRightHand = TrackedJoint.ToString() == "RightHand" ? true : false;
         buttons = new Button[numberOfButtons];
         handPositions = new Vector3[numberOfHandPositions];
         handPositionsTimeSteps = new float[numberOfFrames, numberOfHandPositions, nDims];
         handMedPositions = new Vector3[numberOfHandPositions];
         medMatrix = new float[numberOfHandPositions, nDims];
-        colors = new[] { Color.yellow, Color.yellow, new Color(255, 165, 0, 1), new Color(255, 165, 0, 1), Color.red, Color.red };
+        colors = new[] {Color.red, Color.yellow, Color.yellow, Color.yellow};
         foreach (KeyValuePair<string, int> pair in buttonDict)
         {
             GameObject tmp = GameObject.Find(pair.Key);
             buttons[pair.Value].button = tmp;
             buttons[pair.Value].distance = double.MaxValue;
             buttons[pair.Value].originalColor = tmp.GetComponent<Renderer>().material.color;
-            //print(pair.Value + "   " + buttons[pair.Value]);
         }
         if (BodySrcManager == null)
         {
@@ -80,384 +81,270 @@ public class DetectJoins2 : MonoBehaviour
         {
             BodyManager = BodySrcManager.GetComponent<BodySourceManager>();
         }
-        //Wissen nicht warum das hier steht, ins Update verschoben
-        //GameObject HandLeft = GameObject.Find("model_hand_left");
-        //mesh = HandLeft.GetComponent<MeshFilter>().mesh;
-
+        // find out which device is used at start
+        Frame frame = leap_controller.Frame();
+        trackingLeap = frame.Hands.Count > 0 ? true : false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (BodyManager == null)
+        //GameObject currentHand = GameObject.Find("model_hand_left");
+        GameObject currentHand = gameObject;
+        mesh = currentHand.GetComponent<MeshFilter>().mesh;
+        Frame frame = leap_controller.Frame();
+        makeHandsTransparent();
+        //if (frame.Hands.Count > 0)
+        if (false)
         {
-            return;
-        }
-        bodies = BodyManager.GetData();
-
-        if (bodies == null)
-        {
-            return;
-        }
-        foreach (var body in bodies)
-        {
-            if (body == null)
+            print("Leap!!!!!");
+            //reset frames when the device changes.
+            if (!trackingLeap)
             {
-                continue;
+                currentFrame = 0;
+                trackingLeap = true;
             }
-            if (body.IsTracked)
+            HandList hands = frame.Hands;
+            foreach (Hand hand in hands)
             {
-                GameObject currentHand = GameObject.Find("model_hand_left");
-                mesh = currentHand.GetComponent<MeshFilter>().mesh;
-                var pos = body.Joints[TrackedJoint].Position;
-
-
-
-                //var rot = gameObject.transform.eulerAngles;
-                /*Vector3[] verts;
-                Vector3 vertPos;
-                GameObject[] handles;
-                mesh = GetComponent<MeshFilter>().mesh;
-                verts = mesh.vertices;
-                print("I got " + verts.Length + " vertices-sets");
-                /*foreach (Vector3 vert in verts)
+                if (TrackedJoint.ToString() == "HandLeft" && hand.IsLeft)
                 {
-                    print("Vert is: (x: " + vert[0] + "," + vert[1] + "," + vert[2] + ")");
-                }*/
-
-                /*Vector3[] vertices = mesh.vertices;
-                print("------------------");
-                print("Got vertices:" + vertices);
-                int i = 0;
-                while (i < vertices.Length)
-                {
-                    print("vertices[" + i + "]: " + vertices[i]);
-                    i++;
-                }*/
-                //print("-------");
-                //print("Logging joint " + TrackedJoint + "towards (" + pos.X * scalingFactor + "," + pos.Y * scalingFactor + "," + pos.Z * scalingFactor + ")");
-                //print("Rotation is: (x: " + rot.x + ", y:" + rot.y + ", z: " + rot.z + ")");
-                if (TrackedJoint.ToString() == "HandLeft")
-                {
-                    /*
-                    Frame frame = leap_controller.Frame();
-                    if(frame.Hands.Count > 0)
-                    {
-
-                    }
-                    else
-                    {
-
-                    }
-                    */
-                    var tmppos = body.Joints[JointType.HandLeft].Position;
-                    /*handPositions[0] = new Vector3(scalingFactor* tmppos.X, scalingFactor* tmppos.Y, scalingFactor* tmppos.Z);
-                    tmppos = body.Joints[JointType.WristLeft].Position;
-                    handPositions[1] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
-                    tmppos = body.Joints[JointType.HandTipLeft].Position;
-                    handPositions[2] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
-                    tmppos = body.Joints[JointType.ThumbLeft].Position;
-                    handPositions[3] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
-                    */
-                    handPositionsTimeSteps[currentFrame, 0, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 0, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 0, 2] = scalingFactor * tmppos.Z;
-                    tmppos = body.Joints[JointType.WristLeft].Position;
-                    handPositionsTimeSteps[currentFrame, 1, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 1, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 1, 2] = scalingFactor * tmppos.Z;
-                    tmppos = body.Joints[JointType.HandTipLeft].Position;
-                    handPositionsTimeSteps[currentFrame, 2, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 2, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 2, 2] = scalingFactor * tmppos.Z;
-                    tmppos = body.Joints[JointType.ThumbLeft].Position;
-                    handPositionsTimeSteps[currentFrame, 3, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 3, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 3, 2] = scalingFactor * tmppos.Z;
-                    currentFrame++;
-
-
-                    if ((currentFrame + 1) % numberOfFrames != 0)
-                    {
-                        return;
-                    }
-                    for (int i = 0; i < numberOfHandPositions; i++)
-                    {
-                        for (int j = 0; j < nDims; j++)
-                        {
-                            medMatrix[i, j] = Median(handPositionsTimeSteps, i, j);
-                        }
-                    }
-                    for (int i = 0; i < numberOfHandPositions; i++)
-                    {
-                        //Subtract z coordinate
-                        Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], -medMatrix[i, 2]);
-                        handMedPositions[i] = tmp;
-                    }
-
-                    double fac_med_x = 0.0, fac_med_y = 0.0, fac_med_z = 0.0;
-
-
-
-                    //print(leap_controller.IsConnected);
-                    if (leap_controller.IsConnected)
-                    { //controller is a Controller object
-                        Frame frame = leap_controller.Frame(); //The latest frame
-                        Vector currentLeap = frame.Hands[0].PalmPosition;
-                        if (fac_med_x == 0.0)
-                        {
-                            fac_med_x = currentLeap.x / handMedPositions[0].x;
-                        }
-                        if (fac_med_y == 0.0)
-                        {
-                            fac_med_y = currentLeap.y / handMedPositions[0].y;
-                        }
-                        if (fac_med_z == 0.0)
-                        {
-                            fac_med_z = currentLeap.z / handMedPositions[0].z;
-                        }
-                        fac_med_x = (fac_med_x + currentLeap.x / handMedPositions[0].x) / 2;
-                        fac_med_y = (fac_med_y + currentLeap.y / handMedPositions[0].y) / 2;
-                        fac_med_z = (fac_med_z + currentLeap.z / handMedPositions[0].z) / 2;
-                        print(" Current X factor: " + fac_med_x);
-                        print(" Current Y factor: " + fac_med_y);
-                        print(" Current Z factor: " + fac_med_z);
-                        /*print(currentLeap.x);
-                        print("Leap: " + frame.Hands[0].PalmPosition);
-                        for (int i = 0; i < 1; i++)
-                        {
-                            print("Hand: " + i + " " + handMedPositions[i]);
-                        }*/
-                    }
-
-                    currentFrame = 0;
-                    Vector3 handtip = new Vector3((medMatrix[2, 0] - medMatrix[0, 0]), (medMatrix[2, 1] - medMatrix[0, 1]), (medMatrix[2, 2] - medMatrix[0, 2]));
-                    Vector3 handthumb = new Vector3((medMatrix[3, 0] - medMatrix[0, 0]), (medMatrix[3, 1] - medMatrix[0, 1]), -(medMatrix[3, 2] - medMatrix[0, 2]));
-                    Vector3 cross = Vector3.Cross(handthumb, handtip) * 20;
-                    handthumb = Vector3.Cross(handtip, cross) * 20;
-                    /*foreach (KeyValuePair<string, int> pair in buttonDict)
-                    {
-                        GameObject tmp = GameObject.Find(pair.Key);
-                        buttons[pair.Value].button = tmp;
-                        buttons[pair.Value].distance = -1;
-                        buttons[pair.Value].originalColor = tmp.GetComponent<Renderer>().material.color;
-                        //print(pair.Value + "   " + buttons[pair.Value]);
-                    }*/
-                    //computeDistanceAndColorButtons(handPositions, buttons);
-                    //print(gameObject.transform.position.x);
-                    //print(handPositions[0].x);
-                    /*sum += Math.Abs(gameObject.transform.position.x / handPositions[0].x);
-                    counter += 1;
-                    print("Data: ");
-                    print(Math.Abs(gameObject.transform.position.x / handPositions[0].x));
-                    print(counter);
-                    print(sum / counter);*/
-                    //print(handPositions[1]);
-                    //print(handPositions[2]);
-                    //print(handPositions[3]);
-                    /*
-                    var pos_jointHandLeft = body.Joints[JointType.HandLeft].Position;
-
-                    var pos_jointWristLeft = body.Joints[JointType.WristLeft].Position;
-
-                    var pos_jointTipLeft = body.Joints[JointType.HandTipLeft].Position;
-
-                    var pos_jointThumbLeft = body.Joints[JointType.ThumbLeft].Position;
-                    
-                    //gameObject.transform.rotation.Set
-                    //Create a Quaternion for the rotation of the hand. Therefore take the vector from the tip to the hand as the forward 
-                    //vector for the orientation and from thumb to tip
-                    Vector3 handtip = new Vector3((pos_jointTipLeft.X - pos_jointHandLeft.X), (pos_jointTipLeft.Y - pos_jointHandLeft.Y), (pos_jointTipLeft.Z - pos_jointHandLeft.Z));
-                    Vector3 handthumb = new Vector3((pos_jointThumbLeft.X - pos_jointHandLeft.X), (pos_jointThumbLeft.Y - pos_jointHandLeft.Y), -(pos_jointThumbLeft.Z - pos_jointHandLeft.Z));
-                    Vector3 cross = Vector3.Cross(handthumb, handtip)*20;
-                    handthumb = Vector3.Cross(handtip, cross) * 20;
-                    
-
-
-                    //Debug.DrawLine(handPositions[0] - (handtip * 15), handPositions[0] + (handtip* 15 ), Color.blue);
-                    //Debug.DrawLine(handPositions[0] - (handthumb * 15), handPositions[0] + (handthumb * 15), Color.red);
-                    //Debug.DrawLine(handPositions[0] - (cross * 15), handPositions[0] + (cross * 15), Color.green);
-                    */
-                    Vector3 forward = handthumb;
-                    Vector3 up = Vector3.Cross(handtip, handthumb);
-                    //forward = -up;
-
-                    Quaternion LeftHandRotation = Quaternion.LookRotation(forward, up);
-                    
-                    LeftHandRotation.x = LeftHandRotation.x;
-                    LeftHandRotation.y = LeftHandRotation.y;
-                    LeftHandRotation.z = -LeftHandRotation.z;
-                    LeftHandRotation.w = -LeftHandRotation.w;
-
-                    gameObject.transform.rotation = LeftHandRotation;
-                    gameObject.transform.rotation *= Quaternion.Euler(90, 0, 0);
-                    gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
-
-                    //print("Position: " + pos.X* scalingFactor + " " + pos.Y * scalingFactor + " " + (pos.Z*scalingFactor-350));
-                    //Make hands transparent
-                    Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
-                    gameObject.GetComponent<Renderer>().material.color = temp;
-
-                    var tmpHandPos = GameObject.Find("model_hand_right").transform.position;
-                    var button1Pos = GameObject.Find("Cylinder_036").transform.position;
-                    if (euclideanDistance(tmpHandPos, button1Pos) > euclideanDistance(tmpHandPos, gameObject.transform.position))
-                    {
-                        computeDistanceAndColorButtons(handMedPositions);
-                    }
-                    //for(int i =0; i < handMedPositions.Length; i++)
-                    //{
-                    ///     print("Position: " + handMedPositions[i].x + " " + handMedPositions[i].y + " " + (handMedPositions[i].z));
-                    // }
-
-
-
+                    isRightHand = false;
                 }
-                else if (TrackedJoint.ToString() == "HandRight")
+                else if (TrackedJoint.ToString() == "HandRight" && hand.IsRight)
                 {
-                    /*
-                    var tmppos = body.Joints[JointType.HandRight].Position;
-                    handPositions[0] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
-                    tmppos = body.Joints[JointType.WristRight].Position;
-                    handPositions[1] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
-                    tmppos = body.Joints[JointType.HandTipRight].Position;
-                    handPositions[2] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
-                    tmppos = body.Joints[JointType.ThumbRight].Position;
-                    handPositions[3] = new Vector3(scalingFactor * tmppos.X, scalingFactor * tmppos.Y, scalingFactor * tmppos.Z);
-
-                    var pos_jointHandRight = body.Joints[JointType.HandRight].Position;
-                    var pos_jointWristRight = body.Joints[JointType.WristRight].Position;
-                    var pos_jointTipRight = body.Joints[JointType.HandTipRight].Position;
-                    var pos_jointThumbRight = body.Joints[JointType.ThumbRight].Position;
-
-                    */
-
-
-                    //print("Position Right: ");
-                    //foreach (var b in handPositions)
-                    //{
-                    //    print(b);
-                    //}
-                    /*
-                    print("HandRight: " + gameObject.transform.position);
-                    print(handPositions[0]);
-                    print(handPositions[1]);
-                    print(handPositions[2]);
-                    print(handPositions[3]);*/
-                    /*
-                    Vector3 handtip = new Vector3(pos_jointTipRight.X - pos_jointHandRight.X, pos_jointTipRight.Y - pos_jointHandRight.Y, pos_jointTipRight.Z - pos_jointHandRight.Z);
-                    Vector3 handthumb = new Vector3(pos_jointThumbRight.X - pos_jointHandRight.X, pos_jointThumbRight.Y - pos_jointHandRight.Y, pos_jointThumbRight.Z - pos_jointHandRight.Z);
-                    Vector3 cross = Vector3.Cross(handthumb, handtip) * 20;
-                    handthumb = Vector3.Cross(handtip, cross) * 20;
-                    */
-                    //Debug.DrawLine(handPositions[0] - (handtip * 15), handPositions[0] + (handtip * 15), Color.blue);
-                    //Debug.DrawLine(handPositions[0] - (handthumb * 15), handPositions[0] + (handthumb * 15), Color.red);
-                    //Debug.DrawLine(handPositions[0] - (cross * 15), handPositions[0] + (cross * 15), Color.green);
-                    /*
-                    Vector3 forward = handthumb;
-                    Vector3 up = Vector3.Cross(handtip, handthumb);
-
-                    Quaternion RightHandRotation = Quaternion.LookRotation(forward, up);
-                    RightHandRotation.x = RightHandRotation.x;
-                    RightHandRotation.y = RightHandRotation.y;
-                    RightHandRotation.z = -RightHandRotation.z;
-                    RightHandRotation.w = -RightHandRotation.w;
-                    */
-                    //foreach (KeyValuePair<string, int> pair in buttonDict)
-                    //{
-                    //    GameObject tmp = GameObject.Find(pair.Key);
-                    //    buttons[pair.Value].button = tmp;
-                    //    buttons[pair.Value].distance = -1;
-                    //    buttons[pair.Value].originalColor = tmp.GetComponent<Renderer>().material.color;
-                    //print(pair.Value + "   " + buttons[pair.Value]);
-                    //}
-                    /*
-                    computeDistanceAndColorButtons(handPositions);
-                 
-                    gameObject.transform.rotation = RightHandRotation;
-                    gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
-                    */
-                    Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
-                    gameObject.GetComponent<Renderer>().material.color = temp;
-                    
-
-
-                    //gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, pos.Z * scalingFactor);
-
-
-                    //Object.FindObjectOfType(typeof(MonoBehaviour));
-                    var tmppos = body.Joints[JointType.HandRight].Position;
-                    handPositionsTimeSteps[currentFrame, 0, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 0, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 0, 2] = scalingFactor * tmppos.Z;
-                    tmppos = body.Joints[JointType.WristRight].Position;
-                    handPositionsTimeSteps[currentFrame, 1, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 1, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 1, 2] = scalingFactor * tmppos.Z;
-                    tmppos = body.Joints[JointType.HandTipRight].Position;
-                    handPositionsTimeSteps[currentFrame, 2, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 2, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 2, 2] = scalingFactor * tmppos.Z;
-                    tmppos = body.Joints[JointType.ThumbRight].Position;
-                    handPositionsTimeSteps[currentFrame, 3, 0] = scalingFactor * tmppos.X;
-                    handPositionsTimeSteps[currentFrame, 3, 1] = scalingFactor * tmppos.Y;
-                    handPositionsTimeSteps[currentFrame, 3, 2] = scalingFactor * tmppos.Z;
-                    currentFrame++;
-
-
-                    if ((currentFrame + 1) % numberOfFrames != 0)
-                    {
-                        return;
-                    }
-                    for (int i = 0; i < numberOfHandPositions; i++)
-                    {
-                        for (int j = 0; j < nDims; j++)
-                        {
-                            medMatrix[i, j] = Median(handPositionsTimeSteps, i, j);
-                        }
-                    }
-                    for (int i = 0; i < numberOfHandPositions; i++)
-                    {
-                        //Subtract from z coordinate
-                        Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], -medMatrix[i, 2]);
-                        handMedPositions[i] = tmp;
-                    }
-                    currentFrame = 0;
-                    Vector3 handtip2 = new Vector3((medMatrix[2, 0] - medMatrix[0, 0]), (medMatrix[2, 1] - medMatrix[0, 1]), (medMatrix[2, 2] - medMatrix[0, 2]));
-                    Vector3 handthumb2 = new Vector3((medMatrix[3, 0] - medMatrix[0, 0]), (medMatrix[3, 1] - medMatrix[0, 1]), -(medMatrix[3, 2] - medMatrix[0, 2]));
-                    Vector3 cross2 = Vector3.Cross(handthumb2, handtip2) * 20;
-                    handthumb2 = Vector3.Cross(handtip2, cross2) * 20;
-
-                    //computeDistanceAndColorButtons(handMedPositions);
-
-                    Vector3 forward2 = handthumb2;
-                    Vector3 up2 = Vector3.Cross(handthumb2, handtip2);
-                    //forward = -up;
-
-                    Quaternion RightHandRotation = Quaternion.LookRotation(forward2, up2);
-                    RightHandRotation.x = RightHandRotation.x;
-                    RightHandRotation.y = RightHandRotation.y;
-                    RightHandRotation.z = -RightHandRotation.z;
-                    RightHandRotation.w = -RightHandRotation.w;
-                    gameObject.transform.rotation = RightHandRotation;
-                    gameObject.transform.rotation *= Quaternion.Euler(90, 0, 0);
-                    gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
-
-                    //Make hands transparent
-                    //Color temp2 = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
-                    //gameObject.GetComponent<Renderer>().material.color = temp2;
-
-                    var tmpHandPos = GameObject.Find("model_hand_left").transform.position;
-                    var button1Pos = GameObject.Find("Cylinder_036").transform.position;
-                    if (euclideanDistance(tmpHandPos, button1Pos) > euclideanDistance(tmpHandPos, gameObject.transform.position))
-                    {
-                        computeDistanceAndColorButtons(handMedPositions);
-                    }
+                    isRightHand = true;
                 }
-
+                computeLeapFrameMedian(isRightHand, hand);
             }
+        }
+        else
+        {
+            //print("Kinect!!!");
+            if (trackingLeap)
+            {
+                currentFrame = 0;
+                trackingLeap = false;
+            }
+            if (BodyManager == null)
+            {
+                return;
+            }
+            bodies = BodyManager.GetData();
 
+            if (bodies == null)
+            {
+                return;
+            }
+            foreach (var body in bodies)
+            {
+                if (body == null)
+                {
+                    continue;
+                }
+                if (body.IsTracked)
+                {
+                    //GameObject currentHand = GameObject.Find("model_hand_left");
+                    //mesh = currentHand.GetComponent<MeshFilter>().mesh;
+                    //var pos = body.Joints[TrackedJoint].Position;
+                    if (TrackedJoint.ToString() == "HandLeft")
+                    {
+                        isRightHand = false;
+                    }
+                    else if (TrackedJoint.ToString() == "HandRight")
+                    {
+                        isRightHand = true;
+                    }
+                    computeKinectFrameMedian(isRightHand, body);
+                    
+                }
+            }
         }
     }
+
+    void computeKinectFrameMedian(bool isRightHand, Body body)
+    {
+        var tmppos = new CameraSpacePoint();
+        if (isRightHand)
+        {
+            tmppos = body.Joints[JointType.HandRight].Position;
+        }
+        else
+        {
+            tmppos = body.Joints[JointType.HandLeft].Position;
+        }
+        handPositionsTimeSteps[currentFrame, 0, 0] = scalingFactor * tmppos.X;
+        handPositionsTimeSteps[currentFrame, 0, 1] = scalingFactor * tmppos.Y;
+        handPositionsTimeSteps[currentFrame, 0, 2] = scalingFactor * tmppos.Z;
+        if (isRightHand)
+        {
+            tmppos = body.Joints[JointType.WristRight].Position;
+        }
+        else
+        {
+            tmppos = body.Joints[JointType.WristLeft].Position;
+        }
+        handPositionsTimeSteps[currentFrame, 1, 0] = scalingFactor * tmppos.X;
+        handPositionsTimeSteps[currentFrame, 1, 1] = scalingFactor * tmppos.Y;
+        handPositionsTimeSteps[currentFrame, 1, 2] = scalingFactor * tmppos.Z;
+        if (isRightHand)
+        {
+            tmppos = body.Joints[JointType.HandTipRight].Position;
+        }
+        else
+        {
+            tmppos = body.Joints[JointType.HandTipLeft].Position;
+        }
+        handPositionsTimeSteps[currentFrame, 2, 0] = scalingFactor * tmppos.X;
+        handPositionsTimeSteps[currentFrame, 2, 1] = scalingFactor * tmppos.Y;
+        handPositionsTimeSteps[currentFrame, 2, 2] = scalingFactor * tmppos.Z;
+        if (isRightHand)
+        {
+            tmppos = body.Joints[JointType.ThumbRight].Position;
+        }
+        else
+        {
+            tmppos = body.Joints[JointType.ThumbLeft].Position;
+        }
+        handPositionsTimeSteps[currentFrame, 3, 0] = scalingFactor * tmppos.X;
+        handPositionsTimeSteps[currentFrame, 3, 1] = scalingFactor * tmppos.Y;
+        handPositionsTimeSteps[currentFrame, 3, 2] = scalingFactor * tmppos.Z;
+        currentFrame++;
+
+        if ((currentFrame + 1) % numberOfFrames != 0)
+        {
+            return;
+        }
+        for (int i = 0; i < numberOfHandPositions; i++)
+        {
+            for (int j = 0; j < nDims; j++)
+            {
+                medMatrix[i, j] = Median(handPositionsTimeSteps, i, j);
+            }
+        }
+        var tmp = body.Joints[TrackedJoint].Position;
+        Vector3 tmpvec = new Vector3(tmp.X, tmp.Y, tmp.Z);
+        calculatePositions(tmpvec);
+        calculateActiveHand();
+    }
+
+    void calculatePositions(Vector3 pos) {
+        for (int i = 0; i < numberOfHandPositions; i++)
+        {
+            //Subtract from z coordinate
+            Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], -medMatrix[i, 2]);
+            handMedPositions[i] = tmp;
+        }
+        currentFrame = 0;
+
+        Vector3 handtip = new Vector3((medMatrix[2, 0] - medMatrix[0, 0]), (medMatrix[2, 1] - medMatrix[0, 1]), (medMatrix[2, 2] - medMatrix[0, 2]));
+        Vector3 handthumb = new Vector3((medMatrix[3, 0] - medMatrix[0, 0]), (medMatrix[3, 1] - medMatrix[0, 1]), -(medMatrix[3, 2] - medMatrix[0, 2]));
+        Vector3 cross = Vector3.Cross(handthumb, handtip) * 20;
+
+        handthumb = Vector3.Cross(handtip, cross) * 20;
+        Vector3 forward = handthumb;
+
+        if (isRightHand)
+        {
+            Vector3 up = Vector3.Cross(handthumb, handtip);
+
+            Quaternion RightHandRotation = Quaternion.LookRotation(forward, up);
+            RightHandRotation.x = RightHandRotation.x;
+            RightHandRotation.y = RightHandRotation.y;
+            RightHandRotation.z = -RightHandRotation.z;
+            RightHandRotation.w = -RightHandRotation.w;
+            gameObject.transform.rotation = RightHandRotation;
+            gameObject.transform.rotation *= Quaternion.Euler(90, 0, 0);
+            print("Pos: " + pos);
+            print("handMedPosition: " + handMedPositions[0]);
+            //gameObject.transform.position = new Vector3(pos.x * scalingFactor, pos.y * scalingFactor, -pos.z * scalingFactor);
+            gameObject.transform.position = new Vector3(handMedPositions[0].x, handMedPositions[0].y, handMedPositions[0].z);
+        }
+        else
+        {
+            Vector3 up = Vector3.Cross(handtip, handthumb);
+
+            Quaternion LeftHandRotation = Quaternion.LookRotation(forward, up);
+            LeftHandRotation.x = LeftHandRotation.x;
+            LeftHandRotation.y = LeftHandRotation.y;
+            LeftHandRotation.z = -LeftHandRotation.z;
+            LeftHandRotation.w = -LeftHandRotation.w;
+            gameObject.transform.rotation = LeftHandRotation;
+            gameObject.transform.rotation *= Quaternion.Euler(90, 0, 0);
+            print("Pos: " +  pos);
+            print("handMedPosition: " + handMedPositions[0]);
+            //gameObject.transform.position = new Vector3(pos.x * scalingFactor, pos.y * scalingFactor, -pos.z * scalingFactor);
+            gameObject.transform.position = new Vector3(handMedPositions[0].x, handMedPositions[0].y, handMedPositions[0].z);
+        }
+    }
+
+    void calculateActiveHand() { 
+        //if one right hand is closer to the middle of the coffee machine, it is "active" and can touch buttons
+        Vector3 tmpHandPos = new Vector3();
+        if (isRightHand)
+        {
+            tmpHandPos = GameObject.Find("model_hand_left").transform.position;
+        }
+        else
+        {
+            tmpHandPos = GameObject.Find("model_hand_right").transform.position;
+        }
+
+        var button1Pos = GameObject.Find("Cylinder_036").transform.position;
+        if (euclideanDistance(tmpHandPos, button1Pos) > euclideanDistance(button1Pos, gameObject.transform.position))
+        {
+            computeDistanceAndColorButtons(handMedPositions);
+        }
+    }
+
+    void makeHandsTransparent()
+    {
+        Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
+        gameObject.GetComponent<Renderer>().material.color = temp;
+    }
+
+    //necessary?
+    void computeLeapFrameMedian(bool isRightHand, Hand hand)
+    {
+        //var pos = body.Joints[TrackedJoint].Position;
+
+        var fingers = hand.Fingers;
+        var tmppos = new Vector();
+        tmppos = hand.PalmPosition;
+        handPositionsTimeSteps[currentFrame, 0, 0] = scalingFactor * tmppos.x;
+        handPositionsTimeSteps[currentFrame, 0, 1] = scalingFactor * tmppos.y;
+        handPositionsTimeSteps[currentFrame, 0, 2] = scalingFactor * tmppos.z;
+        tmppos = hand.WristPosition;
+        handPositionsTimeSteps[currentFrame, 1, 0] = scalingFactor * tmppos.x;
+        handPositionsTimeSteps[currentFrame, 1, 1] = scalingFactor * tmppos.y;
+        handPositionsTimeSteps[currentFrame, 1, 2] = scalingFactor * tmppos.z;
+        tmppos = fingers[1].TipPosition;
+        handPositionsTimeSteps[currentFrame, 2, 0] = scalingFactor * tmppos.x;
+        handPositionsTimeSteps[currentFrame, 2, 1] = scalingFactor * tmppos.y;
+        handPositionsTimeSteps[currentFrame, 2, 2] = scalingFactor * tmppos.z;
+        tmppos = fingers[0].TipPosition;
+        handPositionsTimeSteps[currentFrame, 3, 0] = scalingFactor * tmppos.x;
+        handPositionsTimeSteps[currentFrame, 3, 1] = scalingFactor * tmppos.y;
+        handPositionsTimeSteps[currentFrame, 3, 2] = scalingFactor * tmppos.z;
+        currentFrame++;
+
+        if ((currentFrame + 1) % numberOfFrames != 0)
+        {
+            return;
+        }
+        for (int i = 0; i < numberOfHandPositions; i++)
+        {
+            for (int j = 0; j < nDims; j++)
+            {
+                medMatrix[i, j] = Median(handPositionsTimeSteps, i, j);
+            }
+        }
+        Vector3 tmpvec = new Vector3(hand.PalmPosition.x, hand.PalmPosition.y, hand.PalmPosition.z);
+        calculatePositions(tmpvec);
+        calculateActiveHand();
+    }
+
+
     void computeDistanceAndColorButtons(Vector3[] hand)
     {
         double dist = 0;
@@ -499,7 +386,7 @@ public class DetectJoins2 : MonoBehaviour
                 }
                 //print("Set Color to " + colors[i]);
             }
-            else if (buttons[i].distance >= nearThreshold)
+            else
             {
                 if (buttons[i].button.GetComponent<Renderer>().material.color != Color.green)
                 {
@@ -508,6 +395,7 @@ public class DetectJoins2 : MonoBehaviour
                 //print("Reset color: " + buttons[i].button);
             }
         }
+ 
     }
 
     double euclideanDistance(Vector3 x, Vector3 y)

@@ -32,7 +32,6 @@ public class ButtonPush : MonoBehaviour {
         //print("Material color: " + gameObject.GetComponent<Renderer>().material.color);
         //print("Green: " + Color.green);
         //print("Attached rigid body: " + other.attachedRigidbody);
-        print(other.attachedRigidbody.ToString());
         if (other.attachedRigidbody.ToString() == "model_hand_left (UnityEngine.Rigidbody)" || other.attachedRigidbody.ToString() == "model_hand_right (UnityEngine.Rigidbody)")
         {
             gameObject.GetComponent<Renderer>().material.color = Color.green;
