@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System;
 using Windows.Kinect;
 using System.Linq;
+using Leap;
+//using "C:\Users\Lu\Documents\PCDF\New Unity Project\LeapSDK\include\Leap.h";
+
 
 public class DetectJoins : MonoBehaviour {
 
@@ -28,8 +31,10 @@ public class DetectJoins : MonoBehaviour {
     public float[,] medMatrix;
     public List<float> medList;
     public Color[] colors;
-    public int offsetZ = 350;
-
+    public Controller leap_controller = new Controller();
+    public Vector oldLeap;
+    public Vector3 oldKinect;
+   
     public struct Button
     {
         public double distance;
@@ -105,6 +110,8 @@ public class DetectJoins : MonoBehaviour {
                 mesh = currentHand.GetComponent<MeshFilter>().mesh;
                 var pos = body.Joints[TrackedJoint].Position;
 
+
+
                 //var rot = gameObject.transform.eulerAngles;
                 /*Vector3[] verts;
                 Vector3 vertPos;
@@ -131,6 +138,7 @@ public class DetectJoins : MonoBehaviour {
                 //print("Rotation is: (x: " + rot.x + ", y:" + rot.y + ", z: " + rot.z + ")");
                 if (TrackedJoint.ToString() == "HandLeft")
                 {
+
 
                     var tmppos = body.Joints[JointType.HandLeft].Position;
                     /*handPositions[0] = new Vector3(scalingFactor* tmppos.X, scalingFactor* tmppos.Y, scalingFactor* tmppos.Z);
@@ -176,6 +184,42 @@ public class DetectJoins : MonoBehaviour {
                         Vector3 tmp = new Vector3(medMatrix[i, 0], medMatrix[i, 1], -medMatrix[i, 2]);
                         handMedPositions[i] = tmp;
                     }
+
+                    double fac_med_x = 0.0, fac_med_y = 0.0, fac_med_z = 0.0;
+
+                    
+
+                    //print(leap_controller.IsConnected);
+                    if (leap_controller.IsConnected)
+                    { //controller is a Controller object
+                        Frame frame = leap_controller.Frame(); //The latest frame
+                        Vector currentLeap = frame.Hands[0].PalmPosition;
+                        if (fac_med_x == 0.0)
+                        {
+                            fac_med_x = currentLeap.x / handMedPositions[0].x;
+                        }
+                        if (fac_med_y == 0.0)
+                        {
+                            fac_med_y = currentLeap.y / handMedPositions[0].y;
+                        }
+                        if (fac_med_z == 0.0)
+                        {
+                            fac_med_z = currentLeap.z / handMedPositions[0].z;
+                        }
+                        fac_med_x = (fac_med_x + currentLeap.x / handMedPositions[0].x) / 2;
+                        fac_med_y = (fac_med_y + currentLeap.y / handMedPositions[0].y) / 2 ;
+                        fac_med_z = (fac_med_z + currentLeap.z / handMedPositions[0].z) / 2;
+                        //print(" Current X factor: " + fac_med_x);
+                        //print(" Current Y factor: " + fac_med_y);
+                        //print(" Current Z factor: " + fac_med_z);
+                        /*print(currentLeap.x);
+                        print("Leap: " + frame.Hands[0].PalmPosition);
+                        for (int i = 0; i < 1; i++)
+                        {
+                            print("Hand: " + i + " " + handMedPositions[i]);
+                        }*/
+                    }
+
                     currentFrame = 0;
                     Vector3 handtip = new Vector3((medMatrix[2, 0] - medMatrix[0, 0]), (medMatrix[2, 1] - medMatrix[0, 1]), (medMatrix[2, 2] - medMatrix[0, 2]));
                     Vector3 handthumb = new Vector3((medMatrix[3, 0] - medMatrix[0, 0]), (medMatrix[3, 1] - medMatrix[0, 1]), -(medMatrix[3, 2] - medMatrix[0, 2]));
@@ -239,8 +283,8 @@ public class DetectJoins : MonoBehaviour {
 
                     //print("Position: " + pos.X* scalingFactor + " " + pos.Y * scalingFactor + " " + (pos.Z*scalingFactor-350));
                     //Make hands transparent
-                    Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
-                    gameObject.GetComponent<Renderer>().material.color = temp;
+                    //Color temp = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
+                    //gameObject.GetComponent<Renderer>().material.color = temp;
 
                     var tmpHandPos = GameObject.Find("model_hand_right").transform.position;
                     var button1Pos = GameObject.Find("Cylinder_036").transform.position;
@@ -386,8 +430,8 @@ public class DetectJoins : MonoBehaviour {
                     gameObject.transform.position = new Vector3(pos.X * scalingFactor, pos.Y * scalingFactor, -pos.Z * scalingFactor);
 
                     //Make hands transparent
-                    Color temp2 = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
-                    gameObject.GetComponent<Renderer>().material.color = temp2;
+                    //Color temp2 = new Color(gameObject.GetComponent<Renderer>().material.color.r, gameObject.GetComponent<Renderer>().material.color.g, gameObject.GetComponent<Renderer>().material.color.b, 0.5f);
+                    //gameObject.GetComponent<Renderer>().material.color = temp2;
 
                     var tmpHandPos = GameObject.Find("model_hand_left").transform.position;
                     var button1Pos = GameObject.Find("Cylinder_036").transform.position;
@@ -425,11 +469,11 @@ public class DetectJoins : MonoBehaviour {
         }
         for (int i = 0; i < hand.Length; i++)
         {
-            print("Hand: " + i + " " + hand[i]);
+            //print("Hand: " + i + " " + hand[i]);
         }
         for (int i = 0; i < buttons.Length; i++)
         {
-            print(i + " " + buttons[i].distance + " " + buttons[i].button.transform.position);
+            //print(i + " " + buttons[i].distance + " " + buttons[i].button.transform.position);
         }
         Array.Sort<Button>(buttons, (x, y) => x.distance.CompareTo(y.distance)); 
         for(int i = 0; i < buttons.Length; i++)

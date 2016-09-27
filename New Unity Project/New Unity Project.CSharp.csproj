@@ -79,6 +79,9 @@
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
     </Reference>
+    <Reference Include="LeapCSharp.NET3.5">
+      <HintPath>Assets\Scripts\LeapCSharp.NET3.5.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="New Unity Project.CSharp.Plugins.csproj">
@@ -100,6 +103,7 @@
     <Compile Include="Assets\Scripts\ButtonPush.cs" />
     <Compile Include="Assets\Scripts\ComputeDistances.cs" />
     <Compile Include="Assets\Scripts\DetectJoins.cs" />
+    <Compile Include="Assets\Scripts\DetectJoins2.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

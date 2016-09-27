@@ -24,21 +24,30 @@ public class ButtonPush : MonoBehaviour {
         }
     }
 
-
+    
     void OnTriggerEnter(Collider other)
     {
         //print("COLLISIION!!!!!!!!!!!!!!!!!!!");
         //gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.green, 40000f);
-
-        gameObject.GetComponent<Renderer>().material.color = Color.green;
+        //print("Material color: " + gameObject.GetComponent<Renderer>().material.color);
+        //print("Green: " + Color.green);
+        //print("Attached rigid body: " + other.attachedRigidbody);
+        print(other.attachedRigidbody.ToString());
+        if (other.attachedRigidbody.ToString() == "model_hand_left (UnityEngine.Rigidbody)" || other.attachedRigidbody.ToString() == "model_hand_right (UnityEngine.Rigidbody)")
+        {
+            gameObject.GetComponent<Renderer>().material.color = Color.green;
+        }
 
     }
     void OnTriggerStay(Collider other)
     {
         //print("COLLISIION!!!!!!!!!!!!!!!!!!!");
-            //gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.green, 40000f);
-
-        gameObject.GetComponent<Renderer>().material.color = Color.green;
+        //gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.green, 40000f);
+        if (other.attachedRigidbody.ToString() == "model_hand_left" || other.attachedRigidbody.ToString() == "model_hand_right")
+        {
+            gameObject.GetComponent<Renderer>().material.color = Color.green;
+        }
+        //gameObject.GetComponent<Renderer>().material.color = Color.green;
 
     }
 
